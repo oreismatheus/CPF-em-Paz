@@ -12,7 +12,6 @@ import { HABITS } from './constants';
 const App: React.FC = () => {
   const [currentDate, setCurrentDate] = useState<string>(new Date().toISOString().split('T')[0]);
   
-  // Carregamento seguro para evitar tela preta por erro de JSON ou localStorage
   const [logs, setLogs] = useState<DailyLog[]>(() => {
     try {
       const saved = localStorage.getItem('cpf_logs');
@@ -97,15 +96,15 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#000000] text-white selection:bg-[#ff3d00] selection:text-black pb-20">
-      <nav className="bg-[#000000] border-b border-[#111] py-4 px-10 sticky top-0 z-50">
+      <nav className="bg-[#000000] border-b border-[#1a1a1a] py-4 px-10 sticky top-0 z-50">
         <div className="max-w-[1600px] mx-auto flex justify-between items-center">
           <div className="flex items-center group cursor-pointer">
-            <div className="w-10 h-10 bg-[#ff3d00] rounded-xl flex items-center justify-center text-black text-xl font-black shadow-2xl shadow-[#ff3d00]/20 overflow-hidden">
-              <span className="text-[10px]">LOGO</span>
+            <div className="w-10 h-10 bg-[#ff3d00] rounded-xl flex items-center justify-center text-black text-[10px] font-black shadow-2xl shadow-[#ff3d00]/20 overflow-hidden">
+              LOGO
             </div>
             <span className="ml-4 text-xl font-black uppercase italic text-white group-hover:text-[#ff3d00] transition-colors">CPF em Paz</span>
           </div>
-          <div className="hidden md:flex gap-6 text-[11px] font-black uppercase text-slate-600">
+          <div className="hidden md:flex gap-6 text-[11px] font-black uppercase text-slate-500">
             <button className="hover:text-[#ff3d00] transition-colors">Dashboard</button>
             <button className="hover:text-[#ff3d00] transition-colors">Configurações</button>
           </div>
@@ -140,15 +139,15 @@ const App: React.FC = () => {
             />
 
             {/* Gerador de Relatório */}
-            <div className="bg-[#050505] rounded-[2.5rem] p-10 border border-[#111] shadow-2xl">
+            <div className="bg-[#121212] rounded-[2.5rem] p-10 border border-[#262626] shadow-2xl">
               <div className="max-w-xl text-left">
                 <h3 className="text-3xl font-black mb-2 text-[#ff3d00]">Relatório de Evolução</h3>
-                <p className="text-slate-600 text-sm mb-8">Análise de IA sobre sua performance baseada no seu diário.</p>
+                <p className="text-slate-500 text-sm mb-8">Análise de IA sobre sua performance baseada no seu diário.</p>
                 
                 {!analysis && !isAnalyzing && !showAnalysisOptions && (
                   <button 
                     onClick={() => setShowAnalysisOptions(true)}
-                    className="bg-[#ff3d00] text-black px-10 py-5 rounded-3xl font-black text-lg hover:scale-105 transition-all shadow-xl shadow-[#ff3d00]/10"
+                    className="bg-[#ff3d00] text-black px-10 py-5 rounded-3xl font-black text-lg hover:scale-105 transition-all shadow-xl shadow-[#ff3d00]/30 active:scale-95"
                   >
                     Gerar Relatório
                   </button>
@@ -160,7 +159,7 @@ const App: React.FC = () => {
                       <button 
                         key={p}
                         onClick={() => handleGenerateReport(p)}
-                        className="bg-[#000] border border-[#111] hover:border-[#ff3d00]/50 py-3 rounded-2xl text-[10px] font-black uppercase text-slate-500 hover:text-[#ff3d00] transition-all"
+                        className="bg-[#1a1a1a] border border-[#262626] hover:border-[#ff3d00]/50 py-3 rounded-2xl text-[10px] font-black uppercase text-slate-400 hover:text-[#ff3d00] transition-all"
                       >
                         {p}
                       </button>
@@ -177,21 +176,21 @@ const App: React.FC = () => {
 
                 {analysis && !isAnalyzing && (
                   <div className="mt-10 space-y-8 animate-in fade-in duration-500">
-                    <div className="flex items-center justify-between border-b border-[#111] pb-6">
+                    <div className="flex items-center justify-between border-b border-[#262626] pb-6">
                       <div>
                         <div className="text-[10px] font-black text-[#ff3d00] uppercase mb-1">Score Final</div>
                         <div className="text-7xl font-black text-white leading-none">{analysis.score}</div>
                       </div>
-                      <button onClick={() => setAnalysis(null)} className="text-slate-700 hover:text-white transition-colors text-[10px] font-black uppercase">Fechar</button>
+                      <button onClick={() => setAnalysis(null)} className="text-slate-500 hover:text-white transition-colors text-[10px] font-black uppercase">Fechar</button>
                     </div>
                     
                     <div>
                       <h4 className="text-[10px] font-black text-[#ff3d00] uppercase mb-3">Minha Performance</h4>
-                      <p className="text-xl font-bold leading-snug text-slate-200">{analysis.performance}</p>
+                      <p className="text-xl font-bold leading-snug text-slate-100">{analysis.performance}</p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="bg-[#000] p-6 rounded-[1.5rem] border border-[#111]">
+                      <div className="bg-[#1a1a1a] p-6 rounded-[1.5rem] border border-[#262626]">
                         <div className="text-[10px] font-black text-emerald-500 uppercase mb-3">Pontos Positivos</div>
                         <ul className="space-y-2">
                           {analysis.positives.map((s, i) => <li key={i} className="flex items-start text-xs font-bold text-slate-400">
@@ -199,7 +198,7 @@ const App: React.FC = () => {
                           </li>)}
                         </ul>
                       </div>
-                      <div className="bg-[#000] p-6 rounded-[1.5rem] border border-[#111]">
+                      <div className="bg-[#1a1a1a] p-6 rounded-[1.5rem] border border-[#262626]">
                         <div className="text-[10px] font-black text-amber-500 uppercase mb-3">Onde Melhorar</div>
                         <ul className="space-y-2">
                           {analysis.toImprove.map((s, i) => <li key={i} className="flex items-start text-xs font-bold text-slate-400">
@@ -209,7 +208,7 @@ const App: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="bg-[#ff3d00] p-8 rounded-[2rem] text-black">
+                    <div className="bg-[#ff3d00] p-8 rounded-[2rem] text-black shadow-lg shadow-[#ff3d00]/30">
                       <div className="text-[10px] font-black uppercase mb-3 opacity-60">Plano de Ação</div>
                       <p className="text-2xl font-black leading-tight">"{analysis.alternatives}"</p>
                     </div>
@@ -232,7 +231,7 @@ const App: React.FC = () => {
         </div>
       </main>
 
-      <footer className="py-20 text-center text-slate-900 text-[9px] font-black uppercase tracking-[0.5em]">
+      <footer className="py-20 text-center text-slate-800 text-[9px] font-black uppercase tracking-[0.5em]">
         CPF em Paz • 2024
       </footer>
     </div>
