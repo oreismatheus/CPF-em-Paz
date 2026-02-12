@@ -11,9 +11,16 @@ import { HABITS } from './constants';
 
 const App: React.FC = () => {
   const [currentDate, setCurrentDate] = useState<string>(new Date().toISOString().split('T')[0]);
+  
+  // Carregamento seguro para evitar tela preta por erro de JSON ou localStorage
   const [logs, setLogs] = useState<DailyLog[]>(() => {
-    const saved = localStorage.getItem('cpf_logs');
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem('cpf_logs');
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      console.error("Erro ao carregar logs:", e);
+      return [];
+    }
   });
   
   const [activeLog, setActiveLog] = useState<DailyLog>({
@@ -48,7 +55,8 @@ const App: React.FC = () => {
 
   const liveLogs = useMemo(() => {
     const others = logs.filter(l => l.date !== currentDate);
-    return [...others, activeLog].sort((a, b) => a.date.localeCompare(b.date));
+    const sorted = [...others, activeLog].sort((a, b) => a.date.localeCompare(b.date));
+    return sorted;
   }, [logs, activeLog, currentDate]);
 
   const handleToggleHabit = (key: HabitKey) => {
@@ -60,38 +68,44 @@ const App: React.FC = () => {
 
   const handleSave = () => {
     setIsSaving(true);
-    setTimeout(() => {
+    try {
       const updatedLogs = logs.filter(l => l.date !== currentDate);
       updatedLogs.push(activeLog);
       setLogs(updatedLogs);
       localStorage.setItem('cpf_logs', JSON.stringify(updatedLogs));
-      setIsSaving(false);
-    }, 600);
+    } catch (e) {
+      console.error("Erro ao salvar log:", e);
+    } finally {
+      setTimeout(() => setIsSaving(false), 500);
+    }
   };
 
   const handleGenerateReport = async (period: AnalysisPeriod) => {
     setIsAnalyzing(true);
     setShowAnalysisOptions(false);
-    const result = await analyzeHabitsAndJournal(logs, period);
-    setAnalysis(result);
-    setIsAnalyzing(false);
+    try {
+      const result = await analyzeHabitsAndJournal(logs, period);
+      setAnalysis(result);
+    } catch (e) {
+      console.error("Erro no relatório:", e);
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   const periods: AnalysisPeriod[] = ['Semanal', 'Quinzenal', 'Mensal', 'Trimestral', 'Semestral', 'Anual'];
 
   return (
     <div className="min-h-screen bg-[#000000] text-white selection:bg-[#ff3d00] selection:text-black pb-20">
-      <nav className="bg-[#000000]/95 backdrop-blur-xl border-b border-[#1c1c1c] py-5 px-10 sticky top-0 z-50">
+      <nav className="bg-[#000000] border-b border-[#111] py-4 px-10 sticky top-0 z-50">
         <div className="max-w-[1600px] mx-auto flex justify-between items-center">
           <div className="flex items-center group cursor-pointer">
-            {/* Espaço para logo/foto do usuário */}
-            <div className="w-10 h-10 bg-[#ff3d00] rounded-2xl flex items-center justify-center text-black text-xl font-black shadow-2xl shadow-[#ff3d00]/30 group-hover:scale-105 transition-transform overflow-hidden">
-              <span className="group-hover:hidden">C</span>
-              <span className="hidden group-hover:block text-[8px] leading-tight">LOGO</span>
+            <div className="w-10 h-10 bg-[#ff3d00] rounded-xl flex items-center justify-center text-black text-xl font-black shadow-2xl shadow-[#ff3d00]/20 overflow-hidden">
+              <span className="text-[10px]">LOGO</span>
             </div>
             <span className="ml-4 text-xl font-black uppercase italic text-white group-hover:text-[#ff3d00] transition-colors">CPF em Paz</span>
           </div>
-          <div className="hidden md:flex gap-6 text-[11px] font-black uppercase text-slate-500">
+          <div className="hidden md:flex gap-6 text-[11px] font-black uppercase text-slate-600">
             <button className="hover:text-[#ff3d00] transition-colors">Dashboard</button>
             <button className="hover:text-[#ff3d00] transition-colors">Configurações</button>
           </div>
@@ -103,15 +117,9 @@ const App: React.FC = () => {
           <ScoreChart logs={liveLogs} currentScore={activeLog.score} />
         </div>
 
-        <DashboardHeader 
-          currentDate={currentDate} 
-          onDateChange={setCurrentDate} 
-          streak={0}
-        />
-
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
-          {/* Coluna 1: Citação, Escritura, Motivação, Desafio (Esquerda) */}
+          {/* Coluna 1: Conteúdo Lateral (Esquerda) */}
           <div className="lg:col-span-3 space-y-8">
             <ExternalPanel />
           </div>
@@ -131,28 +139,28 @@ const App: React.FC = () => {
               isSaving={isSaving}
             />
 
-            {/* Gerador de Relatório de Evolução */}
-            <div className="bg-[#0a0a0a] rounded-[2.5rem] p-10 border border-[#1c1c1c] shadow-2xl">
-              <div className="max-w-xl">
-                <h3 className="text-3xl font-black mb-3 text-[#ff3d00] tracking-tighter">Relatório de Evolução</h3>
-                <p className="text-slate-500 text-base mb-8 font-medium">Análise avançada da sua performance espiritual e diária.</p>
+            {/* Gerador de Relatório */}
+            <div className="bg-[#050505] rounded-[2.5rem] p-10 border border-[#111] shadow-2xl">
+              <div className="max-w-xl text-left">
+                <h3 className="text-3xl font-black mb-2 text-[#ff3d00]">Relatório de Evolução</h3>
+                <p className="text-slate-600 text-sm mb-8">Análise de IA sobre sua performance baseada no seu diário.</p>
                 
                 {!analysis && !isAnalyzing && !showAnalysisOptions && (
                   <button 
                     onClick={() => setShowAnalysisOptions(true)}
-                    className="bg-[#ff3d00] text-black px-10 py-5 rounded-3xl font-black text-lg hover:scale-105 transition-all shadow-2xl shadow-[#ff3d00]/20 active:scale-95"
+                    className="bg-[#ff3d00] text-black px-10 py-5 rounded-3xl font-black text-lg hover:scale-105 transition-all shadow-xl shadow-[#ff3d00]/10"
                   >
                     Gerar Relatório
                   </button>
                 )}
 
                 {showAnalysisOptions && (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                     {periods.map(p => (
                       <button 
                         key={p}
                         onClick={() => handleGenerateReport(p)}
-                        className="bg-[#000000] border border-[#1c1c1c] hover:border-[#ff3d00]/50 py-3 rounded-2xl text-[10px] font-black uppercase text-slate-500 hover:text-[#ff3d00] transition-all"
+                        className="bg-[#000] border border-[#111] hover:border-[#ff3d00]/50 py-3 rounded-2xl text-[10px] font-black uppercase text-slate-500 hover:text-[#ff3d00] transition-all"
                       >
                         {p}
                       </button>
@@ -162,37 +170,37 @@ const App: React.FC = () => {
 
                 {isAnalyzing && (
                   <div className="flex items-center space-x-5 text-[#ff3d00] font-black text-xs">
-                    <div className="w-6 h-6 border-3 border-[#ff3d00] border-t-transparent rounded-full animate-spin"></div>
-                    <span>ANALISANDO DADOS...</span>
+                    <div className="w-5 h-5 border-2 border-[#ff3d00] border-t-transparent rounded-full animate-spin"></div>
+                    <span>PROCESSANDO PERFORMANCE...</span>
                   </div>
                 )}
 
                 {analysis && !isAnalyzing && (
-                  <div className="mt-10 space-y-8 animate-in fade-in duration-700">
-                    <div className="flex items-center justify-between border-b border-[#1c1c1c] pb-6">
+                  <div className="mt-10 space-y-8 animate-in fade-in duration-500">
+                    <div className="flex items-center justify-between border-b border-[#111] pb-6">
                       <div>
-                        <div className="text-[10px] font-black text-slate-600 uppercase mb-1">Status Final</div>
-                        <div className="text-7xl font-black text-[#ff3d00] leading-none">{analysis.score}</div>
+                        <div className="text-[10px] font-black text-[#ff3d00] uppercase mb-1">Score Final</div>
+                        <div className="text-7xl font-black text-white leading-none">{analysis.score}</div>
                       </div>
-                      <button onClick={() => setAnalysis(null)} className="text-slate-600 hover:text-white transition-colors text-xs font-bold uppercase">Fechar</button>
+                      <button onClick={() => setAnalysis(null)} className="text-slate-700 hover:text-white transition-colors text-[10px] font-black uppercase">Fechar</button>
                     </div>
                     
                     <div>
-                      <div className="text-[10px] font-black text-[#ff3d00] uppercase mb-3">Minha Performance</div>
+                      <h4 className="text-[10px] font-black text-[#ff3d00] uppercase mb-3">Minha Performance</h4>
                       <p className="text-xl font-bold leading-snug text-slate-200">{analysis.performance}</p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="bg-[#000000] p-6 rounded-[1.5rem] border border-[#1c1c1c]">
-                        <div className="text-[10px] font-black text-emerald-500 uppercase mb-3">Fortalezas</div>
+                      <div className="bg-[#000] p-6 rounded-[1.5rem] border border-[#111]">
+                        <div className="text-[10px] font-black text-emerald-500 uppercase mb-3">Pontos Positivos</div>
                         <ul className="space-y-2">
                           {analysis.positives.map((s, i) => <li key={i} className="flex items-start text-xs font-bold text-slate-400">
                             <span className="text-emerald-500 mr-2 mt-0.5">✓</span> {s}
                           </li>)}
                         </ul>
                       </div>
-                      <div className="bg-[#000000] p-6 rounded-[1.5rem] border border-[#1c1c1c]">
-                        <div className="text-[10px] font-black text-amber-500 uppercase mb-3">Ajustes</div>
+                      <div className="bg-[#000] p-6 rounded-[1.5rem] border border-[#111]">
+                        <div className="text-[10px] font-black text-amber-500 uppercase mb-3">Onde Melhorar</div>
                         <ul className="space-y-2">
                           {analysis.toImprove.map((s, i) => <li key={i} className="flex items-start text-xs font-bold text-slate-400">
                             <span className="text-amber-500 mr-2 mt-0.5">→</span> {s}
@@ -201,9 +209,9 @@ const App: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="bg-[#ff3d00] p-8 rounded-[2rem] text-black shadow-lg shadow-[#ff3d00]/10">
-                      <div className="text-[10px] font-black uppercase mb-3 opacity-60">Estratégia Recomendada</div>
-                      <p className="text-2xl font-black leading-tight tracking-tighter">"{analysis.alternatives}"</p>
+                    <div className="bg-[#ff3d00] p-8 rounded-[2rem] text-black">
+                      <div className="text-[10px] font-black uppercase mb-3 opacity-60">Plano de Ação</div>
+                      <p className="text-2xl font-black leading-tight">"{analysis.alternatives}"</p>
                     </div>
                   </div>
                 )}
@@ -224,8 +232,8 @@ const App: React.FC = () => {
         </div>
       </main>
 
-      <footer className="py-20 text-center text-slate-900 text-[10px] font-black uppercase tracking-[0.5em]">
-        CPF em Paz • 2024 • Desenvolvido para Performance
+      <footer className="py-20 text-center text-slate-900 text-[9px] font-black uppercase tracking-[0.5em]">
+        CPF em Paz • 2024
       </footer>
     </div>
   );

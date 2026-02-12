@@ -2,10 +2,17 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { DailyLog, AIAnalysisReport, AnalysisPeriod } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
 export const analyzeHabitsAndJournal = async (logs: DailyLog[], period: AnalysisPeriod): Promise<AIAnalysisReport | null> => {
   try {
+    // Inicialização segura dentro da função
+    const apiKey = process.env.API_KEY || "";
+    if (!apiKey) {
+      console.warn("API Key não encontrada.");
+      return null;
+    }
+
+    const ai = new GoogleGenAI({ apiKey });
+    
     const prompt = `
       Você é um analista de performance humana e espiritual. Analise os dados do usuário do período: ${period}.
       Dados: ${JSON.stringify(logs)}
