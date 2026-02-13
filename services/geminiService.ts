@@ -1,4 +1,3 @@
-
 import { GoogleGenAI } from "@google/genai";
 import { DailyLog, AIAnalysisReport, AnalysisPeriod } from "../types";
 
@@ -25,24 +24,34 @@ export const analyzeHabitsAndJournal = async (logs: DailyLog[], period: Analysis
       };
     }
 
+    // Criamos uma instrução específica baseada no período escolhido
+    const instrucaoPeriodo = {
+      'Semanal': 'Foque nos detalhes dos últimos 7 dias. Seja um mentor que analisa a disciplina diária recente.',
+      'Mensal': 'Faça um balanço do mês. Olhe para a consistência e os hábitos que se repetiram ou falharam.',
+      'Trimestral': 'Analise a direção da vida. É um relatório de médio prazo sobre progresso real.',
+      'Anual': 'Seja profundo e visionário. Analise a construção do legado e as grandes mudanças do ano.'
+    }[period as string] || 'Analise o progresso de forma sábia.';
+
     const prompt = `
       Você é Ari, o pai do usuário. Você é sábio, direto, e conhece a alma do seu filho.
       Você valoriza: Trabalho duro, vender o próprio produto, ser conhecido, falar com autoridade, contemplar a natureza e aproveitar um bom churrasco.
       
-      Analise o progresso dele no período: ${period}. Fale como um pai mentor, não como um robô.
+      CONTEXTO DA ANÁLISE:
+      Estamos gerando um relatório do tipo: ${period}.
+      Sua missão: ${instrucaoPeriodo}
       
-      Dados de Performance (JSON):
+      DADOS DOS REGISTROS (JSON):
       ${JSON.stringify(filteredLogs.slice(-30))}
 
       Gere um relatório rigorosamente no formato JSON:
       {
         "score": número de 0 a 10,
-        "performance": "sua análise sábia e profunda como pai Ari",
-        "positives": ["três pontos positivos específicos"],
-        "toImprove": ["dois pontos de atenção ou falha"],
-        "alternatives": "seu conselho de ouro sobre trabalho, vendas ou natureza"
+        "performance": "sua análise sábia, profunda e SINCERA como pai Ari sobre este período de ${period}",
+        "positives": ["três pontos positivos específicos que você notou nos dados"],
+        "toImprove": ["dois pontos de atenção ou falha baseados nos dados"],
+        "alternatives": "seu conselho de ouro sobre trabalho, vendas ou natureza para o próximo ciclo"
       }
-      RETORNE APENAS O JSON. SEM TEXTO ADICIONAL ANTES OU DEPOIS.
+      RETORNE APENAS O JSON. SEM TEXTO ADICIONAL.
     `;
 
     const response = await ai.models.generateContent({
@@ -56,7 +65,6 @@ export const analyzeHabitsAndJournal = async (logs: DailyLog[], period: Analysis
     const text = response.text;
     if (!text) return null;
     
-    // Extração segura de JSON caso o modelo retorne Markdown ou lixo
     const jsonStart = text.indexOf('{');
     const jsonEnd = text.lastIndexOf('}');
     if (jsonStart === -1 || jsonEnd === -1) return null;
