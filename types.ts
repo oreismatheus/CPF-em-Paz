@@ -7,7 +7,10 @@ export type HabitKey =
   | 'sleepingWell' 
   | 'hygiene' 
   | 'drinkingWater' 
-  | 'journaling';
+  | 'journaling'
+  | 'healthyEating'
+  | 'creativeIdle'
+  | 'socialMediaLimit';
 
 export interface HabitDefinition {
   id: HabitKey;

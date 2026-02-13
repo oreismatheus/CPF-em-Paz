@@ -1,45 +1,62 @@
 
 import React, { useMemo } from 'react';
-import { SCRIPTURES, DAILY_CHALLENGES } from '../constants';
+import { SCRIPTURES, DAILY_CHALLENGES, LDS_QUOTES } from '../constants';
 
 export const ExternalPanel: React.FC = () => {
-  const scripture = useMemo(() => SCRIPTURES[Math.floor(Math.random() * SCRIPTURES.length)], []);
-  const challenge = useMemo(() => DAILY_CHALLENGES[Math.floor(Math.random() * DAILY_CHALLENGES.length)], []);
+  const dailyIndex = useMemo(() => {
+    const now = new Date();
+    const start = new Date(now.getFullYear(), 0, 0);
+    const diff = (now.getTime() - start.getTime()) + ((start.getTimezoneOffset() - now.getTimezoneOffset()) * 60 * 1000);
+    const oneDay = 1000 * 60 * 60 * 24;
+    return Math.floor(diff / oneDay);
+  }, []);
+
+  const quote = LDS_QUOTES[dailyIndex % LDS_QUOTES.length];
+  const scripture = SCRIPTURES[dailyIndex % SCRIPTURES.length];
+  const challenge = DAILY_CHALLENGES[dailyIndex % DAILY_CHALLENGES.length];
+
+  const Card = ({ title, content, subContent }: { title: string, content: string, subContent?: string }) => (
+    <div className="rounded-[1.5rem] p-6 border border-[#262626] bg-[#121212] transition-all shadow-xl">
+      <div className="mb-4">
+        <span className="inline-block px-3 py-1 rounded-lg text-[9px] font-black uppercase bg-[#ff3d00] text-black">
+          {title}
+        </span>
+      </div>
+      <p className="text-base leading-relaxed font-bold text-slate-200">
+        "{content}"
+      </p>
+      {subContent && (
+        <div className="mt-3 text-[10px] font-black text-[#ff3d00] uppercase">
+          {subContent}
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <div className="space-y-6">
-      {/* 1. Citação do Dia */}
-      <div className="bg-[#121212] rounded-[2rem] p-6 border border-[#262626] shadow-xl">
-        <h4 className="text-[10px] font-black uppercase mb-3 text-[#ff3d00]">Citação do Dia</h4>
-        <p className="text-base font-bold text-slate-100 leading-snug">
-          "O futuro é tão brilhante quanto a sua fé."
-        </p>
-        <p className="text-[10px] mt-2 font-black text-slate-500 uppercase">Thomas S. Monson</p>
-      </div>
-
-      {/* 2. Escritura do Dia */}
-      <div className="bg-[#121212] rounded-[2rem] p-6 border border-[#262626] shadow-xl">
-        <div className="mb-4">
-          <span className="inline-block px-3 py-1 bg-[#ff3d00]/10 text-[#ff3d00] rounded-full text-[10px] font-black uppercase border border-[#ff3d00]/20">Escritura</span>
-        </div>
-        <p className="text-slate-100 text-lg leading-relaxed mb-4 font-bold">
-          "{scripture.text}"
-        </p>
-        <div className="text-[10px] font-black text-slate-500 uppercase">{scripture.ref}</div>
-      </div>
-
-      {/* 3. Motivação do Dia */}
-      <div className="bg-[#121212] rounded-[2rem] p-6 border border-[#262626] shadow-xl">
-        <h4 className="text-[10px] font-black uppercase mb-3 text-[#ff3d00]">Motivação</h4>
-        <p className="text-base font-black text-slate-100 leading-tight">"A consistência é a única ponte entre o seu eu atual e o seu eu ideal."</p>
-      </div>
+      <Card 
+        title="Citação de Líder SUD" 
+        content={quote.text}
+        subContent={quote.author}
+      />
       
-      {/* 4. Desafio do Dia */}
-      <div className="bg-[#ff3d00] rounded-[2rem] p-6 text-black shadow-2xl shadow-[#ff3d00]/30 border border-[#ff3d00]/40">
-        <h4 className="text-[10px] font-black uppercase mb-3 opacity-70">Desafio do Dia</h4>
-        <p className="text-xl font-black leading-tight">"{challenge}"</p>
-        <div className="mt-4 w-10 h-0.5 bg-black/20 rounded-full"></div>
-      </div>
+      <Card 
+        title="Escritura" 
+        content={scripture.text}
+        subContent={scripture.ref}
+      />
+
+      <Card 
+        title="Frase do Dia" 
+        content="O amanhã será melhor se fizermos o melhor hoje. Siga em frente com fé e propósito."
+        subContent="Motivação"
+      />
+      
+      <Card 
+        title="Desafio 24h" 
+        content={challenge}
+      />
     </div>
   );
 };

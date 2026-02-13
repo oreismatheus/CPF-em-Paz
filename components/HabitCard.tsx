@@ -11,9 +11,41 @@ interface HabitCardProps {
 }
 
 export const HabitCard: React.FC<HabitCardProps> = ({ completedHabits, onToggle, logs, currentDate }) => {
-  const getFrequency = (key: HabitKey) => {
-    const historyCount = logs.filter(log => log.date !== currentDate && log.habits[key]).length;
-    return historyCount + (completedHabits[key] ? 1 : 0);
+  const getStreak = (key: HabitKey) => {
+    let streak = 0;
+    const sortedLogs = [...logs].sort((a, b) => b.date.localeCompare(a.date));
+    
+    // Data atual
+    const todayDone = completedHabits[key];
+    
+    // Verifica a partir de ontem
+    const yesterday = new Date(currentDate);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = yesterday.toISOString().split('T')[0];
+    
+    const findLog = (dateStr: string) => logs.find(l => l.date === dateStr);
+    
+    if (todayDone) {
+      streak = 1;
+      let checkDate = new Date(currentDate);
+      while (true) {
+        checkDate.setDate(checkDate.getDate() - 1);
+        const dStr = checkDate.toISOString().split('T')[0];
+        const log = findLog(dStr);
+        if (log && log.habits[key]) {
+          streak++;
+        } else {
+          break;
+        }
+      }
+    } else {
+      // Se não fez hoje, verifica se fez ontem para manter a "frequência ativa" visual
+      // Mas o usuário pediu: "Se eu falhar um dia, esse contador volta para zero"
+      // Então se hoje (currentDate) não está marcado, o streak de hoje é 0.
+      streak = 0;
+    }
+    
+    return streak;
   };
 
   return (
@@ -23,7 +55,7 @@ export const HabitCard: React.FC<HabitCardProps> = ({ completedHabits, onToggle,
       </h3>
       <div className="space-y-4">
         {HABITS.map((habit) => {
-          const freq = getFrequency(habit.id);
+          const streak = getStreak(habit.id);
           const isDoneToday = completedHabits[habit.id];
 
           return (
@@ -45,7 +77,7 @@ export const HabitCard: React.FC<HabitCardProps> = ({ completedHabits, onToggle,
                     {habit.label}
                   </div>
                   <div className={`text-[10px] uppercase mt-1 font-black ${isDoneToday ? 'text-[#ff3d00]/80' : 'text-slate-500'}`}>
-                    Frequência Total: {freq} {freq === 1 ? 'dia' : 'dias'}
+                    Frequência Consecutiva: {streak} {streak === 1 ? 'dia' : 'dias'}
                   </div>
                 </div>
               </label>

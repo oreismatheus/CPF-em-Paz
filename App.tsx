@@ -1,9 +1,8 @@
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { HabitKey, DailyLog, AIAnalysisReport, AnalysisPeriod } from './types';
 import { HabitCard } from './components/HabitCard';
 import { JournalEditor } from './components/JournalEditor';
-import { DashboardHeader } from './components/DashboardHeader';
 import { ScoreChart } from './components/ScoreChart';
 import { ExternalPanel } from './components/ExternalPanel';
 import { analyzeHabitsAndJournal } from './services/geminiService';
@@ -17,7 +16,6 @@ const App: React.FC = () => {
       const saved = localStorage.getItem('cpf_logs');
       return saved ? JSON.parse(saved) : [];
     } catch (e) {
-      console.error("Erro ao carregar logs:", e);
       return [];
     }
   });
@@ -52,31 +50,28 @@ const App: React.FC = () => {
     }
   }, [currentDate, logs]);
 
-  const liveLogs = useMemo(() => {
-    const others = logs.filter(l => l.date !== currentDate);
-    const sorted = [...others, activeLog].sort((a, b) => a.date.localeCompare(b.date));
-    return sorted;
-  }, [logs, activeLog, currentDate]);
+  const persistLog = useCallback((updatedLog: DailyLog) => {
+    setLogs(prev => {
+      const filtered = prev.filter(l => l.date !== updatedLog.date);
+      const newLogs = [...filtered, updatedLog].sort((a, b) => a.date.localeCompare(b.date));
+      localStorage.setItem('cpf_logs', JSON.stringify(newLogs));
+      return newLogs;
+    });
+  }, []);
 
   const handleToggleHabit = (key: HabitKey) => {
     const newHabits = { ...activeLog.habits, [key]: !activeLog.habits[key] };
     const completedCount = Object.values(newHabits).filter(Boolean).length;
     const newScore = Math.round((completedCount / HABITS.length) * 10);
-    setActiveLog(prev => ({ ...prev, habits: newHabits, score: newScore }));
+    const updated = { ...activeLog, habits: newHabits, score: newScore };
+    setActiveLog(updated);
+    persistLog(updated); 
   };
 
-  const handleSave = () => {
+  const handleManualSave = () => {
     setIsSaving(true);
-    try {
-      const updatedLogs = logs.filter(l => l.date !== currentDate);
-      updatedLogs.push(activeLog);
-      setLogs(updatedLogs);
-      localStorage.setItem('cpf_logs', JSON.stringify(updatedLogs));
-    } catch (e) {
-      console.error("Erro ao salvar log:", e);
-    } finally {
-      setTimeout(() => setIsSaving(false), 500);
-    }
+    persistLog(activeLog);
+    setTimeout(() => setIsSaving(false), 600);
   };
 
   const handleGenerateReport = async (period: AnalysisPeriod) => {
@@ -84,9 +79,9 @@ const App: React.FC = () => {
     setShowAnalysisOptions(false);
     try {
       const result = await analyzeHabitsAndJournal(logs, period);
-      setAnalysis(result);
+      if (result) setAnalysis(result);
     } catch (e) {
-      console.error("Erro no relatório:", e);
+      console.error(e);
     } finally {
       setIsAnalyzing(false);
     }
@@ -95,71 +90,96 @@ const App: React.FC = () => {
   const periods: AnalysisPeriod[] = ['Semanal', 'Quinzenal', 'Mensal', 'Trimestral', 'Semestral', 'Anual'];
 
   return (
-    <div className="min-h-screen bg-[#000000] text-white selection:bg-[#ff3d00] selection:text-black pb-20">
-      <nav className="bg-[#000000] border-b border-[#1a1a1a] py-4 px-10 sticky top-0 z-50">
+    <div className="min-h-screen text-white selection:bg-[#ff3d00] selection:text-black pb-10">
+      <nav className="border-b border-white/5 py-6 px-10 sticky top-0 z-50 bg-[#0d0d0d]/80 backdrop-blur-md">
         <div className="max-w-[1600px] mx-auto flex justify-between items-center">
-          <div className="flex items-center group cursor-pointer">
-            <div className="w-10 h-10 bg-[#ff3d00] rounded-xl flex items-center justify-center text-black text-[10px] font-black shadow-2xl shadow-[#ff3d00]/20 overflow-hidden">
-              LOGO
-            </div>
-            <span className="ml-4 text-xl font-black uppercase italic text-white group-hover:text-[#ff3d00] transition-colors">CPF em Paz</span>
+          <div className="flex-1">
+            <span className="text-2xl font-black uppercase italic text-white hover:text-[#ff3d00] transition-colors cursor-default">
+              CPF em Paz
+            </span>
           </div>
-          <div className="hidden md:flex gap-6 text-[11px] font-black uppercase text-slate-500">
-            <button className="hover:text-[#ff3d00] transition-colors">Dashboard</button>
-            <button className="hover:text-[#ff3d00] transition-colors">Configurações</button>
+          <div className="flex-1 flex justify-center items-center gap-4">
+             <span className="text-[10px] font-black text-[#ff3d00] uppercase tracking-widest hidden sm:block">Foco & Fé</span>
+             <input 
+              type="date" 
+              value={currentDate} 
+              onChange={(e) => setCurrentDate(e.target.value)}
+              className="bg-[#121212] border border-[#ff3d00]/30 rounded-xl px-5 py-2 text-sm font-black text-[#ff3d00] outline-none hover:border-[#ff3d00] transition-all"
+            />
+          </div>
+          <div className="flex-1 text-right">
+            <a 
+              href="https://instagram.com/oreismatheus" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-[11px] font-black text-slate-500 hover:text-[#ff3d00] transition-colors uppercase"
+            >
+              @oreismatheus
+            </a>
           </div>
         </div>
       </nav>
 
-      <main className="max-w-[1600px] mx-auto px-6 py-8 space-y-10">
-        <div className="w-full">
-          <ScoreChart logs={liveLogs} currentScore={activeLog.score} />
+      <main className="max-w-[1600px] mx-auto px-6 py-8 space-y-12">
+        <div className="w-full flex justify-center">
+          <div className="w-full">
+            <ScoreChart logs={logs} currentScore={activeLog.score} currentDate={currentDate} />
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          
-          {/* Coluna 1: Conteúdo Lateral (Esquerda) */}
           <div className="lg:col-span-3 space-y-8">
             <ExternalPanel />
           </div>
 
-          {/* Coluna 2: Diário e Relatório (Meio) */}
           <div className="lg:col-span-6 space-y-8">
             <JournalEditor 
               currentDate={currentDate}
               onDateChange={setCurrentDate}
               notes={activeLog.notes}
-              setNotes={(v) => setActiveLog(p => ({ ...p, notes: v }))}
+              setNotes={(v) => {
+                const updated = { ...activeLog, notes: v };
+                setActiveLog(updated);
+                persistLog(updated);
+              }}
               mood={activeLog.mood}
-              setMood={(v) => setActiveLog(p => ({ ...p, mood: v }))}
+              setMood={(v) => {
+                const updated = { ...activeLog, mood: v };
+                setActiveLog(updated);
+                persistLog(updated);
+              }}
               weather={activeLog.weather}
-              setWeather={(v) => setActiveLog(p => ({ ...p, weather: v }))}
-              onSave={handleSave}
+              setWeather={(v) => {
+                const updated = { ...activeLog, weather: v };
+                setActiveLog(updated);
+                persistLog(updated);
+              }}
+              onSave={handleManualSave}
               isSaving={isSaving}
             />
 
-            {/* Gerador de Relatório */}
-            <div className="bg-[#121212] rounded-[2.5rem] p-10 border border-[#262626] shadow-2xl">
-              <div className="max-w-xl text-left">
-                <h3 className="text-3xl font-black mb-2 text-[#ff3d00]">Relatório de Evolução</h3>
-                <p className="text-slate-500 text-sm mb-8">Análise de IA sobre sua performance baseada no seu diário.</p>
+            {/* Container do Relatório com correção de bug de tamanho e persona de Pai Sábio */}
+            <div className="bg-[#121212] rounded-[2.5rem] p-8 border border-[#262626] shadow-2xl relative overflow-hidden min-h-[200px]">
+              <div className="max-w-full text-left">
+                <h3 className="text-3xl font-black mb-1 text-[#ff3d00]">Relatório de Evolução</h3>
+                <p className="text-slate-500 text-xs mb-6">Uma análise sábia dos seus dias com o conselho do seu pai.</p>
                 
                 {!analysis && !isAnalyzing && !showAnalysisOptions && (
                   <button 
                     onClick={() => setShowAnalysisOptions(true)}
-                    className="bg-[#ff3d00] text-black px-10 py-5 rounded-3xl font-black text-lg hover:scale-105 transition-all shadow-xl shadow-[#ff3d00]/30 active:scale-95"
+                    className="bg-[#ff3d00] text-black px-8 py-4 rounded-2xl font-black text-sm hover:scale-105 transition-all shadow-lg shadow-[#ff3d00]/20"
                   >
-                    Gerar Relatório
+                    Ouvir Sabedoria
                   </button>
                 )}
 
                 {showAnalysisOptions && (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                     {periods.map(p => (
                       <button 
                         key={p}
                         onClick={() => handleGenerateReport(p)}
-                        className="bg-[#1a1a1a] border border-[#262626] hover:border-[#ff3d00]/50 py-3 rounded-2xl text-[10px] font-black uppercase text-slate-400 hover:text-[#ff3d00] transition-all"
+                        className="bg-[#1a1a1a] border border-[#262626] hover:border-[#ff3d00] py-3 rounded-xl text-[9px] font-black uppercase text-slate-500 hover:text-white transition-all"
                       >
                         {p}
                       </button>
@@ -168,49 +188,49 @@ const App: React.FC = () => {
                 )}
 
                 {isAnalyzing && (
-                  <div className="flex items-center space-x-5 text-[#ff3d00] font-black text-xs">
-                    <div className="w-5 h-5 border-2 border-[#ff3d00] border-t-transparent rounded-full animate-spin"></div>
-                    <span>PROCESSANDO PERFORMANCE...</span>
+                  <div className="flex items-center space-x-4 text-[#ff3d00] font-black text-[10px]">
+                    <div className="w-4 h-4 border-2 border-[#ff3d00] border-t-transparent rounded-full animate-spin"></div>
+                    <span>SEU PAI ESTÁ OBSERVANDO SEUS PASSOS COM SABEDORIA...</span>
                   </div>
                 )}
 
                 {analysis && !isAnalyzing && (
-                  <div className="mt-10 space-y-8 animate-in fade-in duration-500">
-                    <div className="flex items-center justify-between border-b border-[#262626] pb-6">
+                  <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                    <div className="flex items-end justify-between border-b border-[#262626] pb-4">
                       <div>
-                        <div className="text-[10px] font-black text-[#ff3d00] uppercase mb-1">Score Final</div>
-                        <div className="text-7xl font-black text-white leading-none">{analysis.score}</div>
+                        <div className="text-[9px] font-black text-[#ff3d00] uppercase mb-1">Nota de Performance</div>
+                        <div className="text-6xl font-black text-white leading-none">{analysis.score}</div>
                       </div>
-                      <button onClick={() => setAnalysis(null)} className="text-slate-500 hover:text-white transition-colors text-[10px] font-black uppercase">Fechar</button>
+                      <button onClick={() => setAnalysis(null)} className="text-slate-600 hover:text-white transition-colors text-[9px] font-black uppercase">Nova Consulta</button>
                     </div>
                     
                     <div>
-                      <h4 className="text-[10px] font-black text-[#ff3d00] uppercase mb-3">Minha Performance</h4>
-                      <p className="text-xl font-bold leading-snug text-slate-100">{analysis.performance}</p>
+                      <h4 className="text-[9px] font-black text-[#ff3d00] uppercase mb-2">Análise Sábia</h4>
+                      <p className="text-lg font-bold leading-tight text-slate-100 italic">"{analysis.performance}"</p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="bg-[#1a1a1a] p-6 rounded-[1.5rem] border border-[#262626]">
-                        <div className="text-[10px] font-black text-emerald-500 uppercase mb-3">Pontos Positivos</div>
-                        <ul className="space-y-2">
-                          {analysis.positives.map((s, i) => <li key={i} className="flex items-start text-xs font-bold text-slate-400">
-                            <span className="text-emerald-500 mr-2 mt-0.5">✓</span> {s}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="bg-[#1a1a1a] p-5 rounded-[1.2rem] border border-[#262626]">
+                        <div className="text-[9px] font-black text-emerald-500 uppercase mb-2">Pontos Positivos</div>
+                        <ul className="space-y-1">
+                          {analysis.positives.map((s, i) => <li key={i} className="flex items-start text-[11px] font-bold text-slate-400">
+                            <span className="text-emerald-500 mr-2">✓</span> {s}
                           </li>)}
                         </ul>
                       </div>
-                      <div className="bg-[#1a1a1a] p-6 rounded-[1.5rem] border border-[#262626]">
-                        <div className="text-[10px] font-black text-amber-500 uppercase mb-3">Onde Melhorar</div>
-                        <ul className="space-y-2">
-                          {analysis.toImprove.map((s, i) => <li key={i} className="flex items-start text-xs font-bold text-slate-400">
-                            <span className="text-amber-500 mr-2 mt-0.5">→</span> {s}
+                      <div className="bg-[#1a1a1a] p-5 rounded-[1.2rem] border border-[#262626]">
+                        <div className="text-[9px] font-black text-amber-500 uppercase mb-2">Pontos Negativos</div>
+                        <ul className="space-y-1">
+                          {analysis.toImprove.map((s, i) => <li key={i} className="flex items-start text-[11px] font-bold text-slate-400">
+                            <span className="text-amber-500 mr-2">→</span> {s}
                           </li>)}
                         </ul>
                       </div>
                     </div>
 
-                    <div className="bg-[#ff3d00] p-8 rounded-[2rem] text-black shadow-lg shadow-[#ff3d00]/30">
-                      <div className="text-[10px] font-black uppercase mb-3 opacity-60">Plano de Ação</div>
-                      <p className="text-2xl font-black leading-tight">"{analysis.alternatives}"</p>
+                    <div className="bg-[#ff3d00] p-6 rounded-[1.8rem] text-black shadow-lg">
+                      <div className="text-[9px] font-black uppercase mb-2 opacity-70">Conselho do seu Pai</div>
+                      <p className="text-xl font-black leading-tight">{analysis.alternatives}</p>
                     </div>
                   </div>
                 )}
@@ -218,7 +238,6 @@ const App: React.FC = () => {
             </div>
           </div>
 
-          {/* Coluna 3: Hábitos (Direita) */}
           <div className="lg:col-span-3 space-y-8">
             <HabitCard 
               completedHabits={activeLog.habits} 
@@ -227,12 +246,14 @@ const App: React.FC = () => {
               currentDate={currentDate}
             />
           </div>
-
         </div>
       </main>
 
-      <footer className="py-20 text-center text-slate-800 text-[9px] font-black uppercase tracking-[0.5em]">
-        CPF em Paz • 2024
+      {/* Rodapé invisível / Mesma cor do fundo conforme pedido */}
+      <footer className="py-10 text-center select-none opacity-0">
+        <span className="text-[#0d0d0d] text-[10px] font-black uppercase tracking-[0.5em]">
+          My CPF in Peace • 2025
+        </span>
       </footer>
     </div>
   );
