@@ -3,15 +3,16 @@ import { DailyLog, AIAnalysisReport, AnalysisPeriod } from "../types";
 
 export const analyzeHabitsAndJournal = async (logs: DailyLog[], period: AnalysisPeriod): Promise<AIAnalysisReport | null> => {
   try {
-    const apiKey = process.env.API_KEY;
+    // Ajuste para funcionar no Vite e na Vercel
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY || process.env.API_KEY || process.env.VITE_GEMINI_API_KEY;
+    
     if (!apiKey) {
-      console.error("API_KEY não configurada.");
+      console.error("API_KEY não localizada. Verifique as variáveis de ambiente.");
       return null;
     }
 
-    const ai = new GoogleGenAI({ apiKey: apiKey });
+    const ai = new GoogleGenAI(apiKey);
     
-    // Filtramos apenas logs significativos
     const filteredLogs = logs.filter(l => l.score > 0 || l.notes.trim().length > 0);
     
     if (filteredLogs.length === 0) {
@@ -24,7 +25,6 @@ export const analyzeHabitsAndJournal = async (logs: DailyLog[], period: Analysis
       };
     }
 
-    // Criamos uma instrução específica baseada no período escolhido
     const instrucaoPeriodo = {
       'Semanal': 'Foque nos detalhes dos últimos 7 dias. Seja um mentor que analisa a disciplina diária recente.',
       'Mensal': 'Faça um balanço do mês. Olhe para a consistência e os hábitos que se repetiram ou falharam.',
@@ -54,15 +54,12 @@ export const analyzeHabitsAndJournal = async (logs: DailyLog[], period: Analysis
       RETORNE APENAS O JSON. SEM TEXTO ADICIONAL.
     `;
 
-    const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
-      contents: prompt,
-      config: {
-        responseMimeType: "application/json",
-      },
-    });
+    const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    const text = response.text;
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+    
     if (!text) return null;
     
     const jsonStart = text.indexOf('{');
