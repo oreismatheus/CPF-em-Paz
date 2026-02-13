@@ -9,7 +9,6 @@ export type HabitKey =
   | 'drinkingWater' 
   | 'journaling'
   | 'healthyEating'
-  | 'creativeIdle'
   | 'socialMediaLimit';
 
 export interface HabitDefinition {

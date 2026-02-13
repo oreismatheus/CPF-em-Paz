@@ -11,7 +11,6 @@ export const HABITS: HabitDefinition[] = [
   { id: 'drinkingWater', label: 'Beber Água (2L)', icon: '💧' },
   { id: 'journaling', label: 'Escrever no diário', icon: '📝' },
   { id: 'healthyEating', label: 'Alimentação Saudável', icon: '🥗' },
-  { id: 'creativeIdle', label: '10 min Ócio Criativo', icon: '💡' },
   { id: 'socialMediaLimit', label: 'Máx 2h Redes Sociais', icon: '📱' },
 ];
 
@@ -33,22 +32,22 @@ export const DAILY_CHALLENGES = [
 ];
 
 export const LDS_QUOTES = [
-  { text: "O Senhor ama o esforço, porque o esforço traz recompensas que não podem vir de outra forma.", author: "Russell M. Nelson" },
-  { text: "A alegria que sentimos tem pouco a ver com as circunstâncias de nossa vida e tudo a ver com o foco de nossa vida.", author: "Russell M. Nelson" },
-  { text: "Não se compare com os outros. Compare-se com a pessoa que você era ontem.", author: "Dieter F. Uchtdorf" },
-  { text: "Nossa meta deve ser a excelência, não a perfeição.", author: "Dallin H. Oaks" },
-  { text: "A fé não é apenas um sentimento; é uma decisão.", author: "Neil L. Andersen" },
-  { text: "O amanhã será melhor se fizermos o melhor hoje.", author: "Thomas S. Monson" },
-  { text: "A verdadeira medida de sua vida não é quanto você acumulou, mas quanto você deu.", author: "M. Russell Ballard" }
+  { text: "Pensem Celestial! Ao fazê-lo, seus problemas diminuirão e sua fé aumentará.", author: "Russell M. Nelson", source: "Conferência Geral, Outubro 2023" },
+  { text: "O Senhor ama o esforço, porque o esforço traz recompensas que não poderiam vir de outra forma.", author: "Russell M. Nelson", source: "Discurso de Devocional, 2020" },
+  { text: "Deus não Se importa se estamos em um castelo ou em uma choupana, se somos bonitos ou comuns. Ele nos ama porque somos Seus filhos.", author: "Dieter F. Uchtdorf", source: "Conferência Geral, Outubro 2009" },
+  { text: "Nossa meta deve ser a excelência, não a perfeição.", author: "Dallin H. Oaks", source: "Conferência Geral, Outubro 2023" },
+  { text: "A fé não é apenas um sentimento; é uma decisão.", author: "Neil L. Andersen", source: "Conferência Geral, Outubro 2022" },
+  { text: "O amanhã será melhor se fizermos o melhor hoje.", author: "Thomas S. Monson", source: "Conferência Geral, Abril 2011" },
+  { text: "As decisões que vocês tomam aqui e agora são para sempre.", author: "M. Russell Ballard", source: "Conferência Geral, Abril 2015" }
 ];
 
 export const SCRIPTURES = [
-  { text: "E agora, meus filhos, lembrai-vos, lembrai-vos de que é sobre a rocha de nosso Redentor, que é Cristo, o Filho de Deus, que deveis construir vossos alicerces.", ref: "Helamã 5:12 (Livro de Mórmon)" },
-  { text: "Pois eis que este é meu trabalho e minha glória: Levar a efeito a imortalidade e vida eterna do homem.", ref: "Moisés 1:39 (Pérola de Grande Valor)" },
-  { text: "Busquem diligentemente, orem sempre e sejam crentes; e todas as coisas contribuirão para o vosso bem.", ref: "Doutrina e Convênios 90:24" },
-  { text: "Eu, o Senhor, estou obrigado quando fazeis o que eu digo; mas quando não fazeis o que eu digo, não tendes promessa alguma.", ref: "Doutrina e Convênios 82:10" },
-  { text: "E se os homens vierem a mim, mostrar-lhes-ei sua fraqueza... minha graça basta a todos os que se humilham perante mim.", ref: "Éter 12:27 (Livro de Mórmon)" },
-  { text: "Adam caiu para que os homens existissem; e os homens existem para que tenham alegria.", ref: "2 Néfi 2:25 (Livro de Mórmon)" }
+  { text: "E agora, meus filhos, lembrai-vos, lembrai-vos de que é sobre a rocha de nosso Redentor, que é Cristo, o Filho de Deus, que deveis construir vossos alicerces.", ref: "Helamã 5:12", source: "Livro de Mórmon" },
+  { text: "Pois eis que este é meu trabalho e minha glória: Levar a efeito a imortalidade e vida eterna do homem.", ref: "Moisés 1:39", source: "Pérola de Grande Valor" },
+  { text: "Busquem diligentemente, orem sempre e sejam crentes; e todas as coisas contribuirão para o vosso bem.", ref: "Doutrina e Convênios 90:24", source: "Doutrina e Convênios" },
+  { text: "Eu, o Senhor, estou obrigado quando fazeis o que eu digo; mas quando não fazeis o que eu digo, não tendes promessa alguma.", ref: "Doutrina e Convênios 82:10", source: "Doutrina e Convênios" },
+  { text: "E se os homens vierem a mim, mostrar-lhes-ei sua fraqueza... minha graça basta a todos os que se humilham perante mim.", ref: "Éter 12:27", source: "Livro de Mórmon" },
+  { text: "Adam caiu para que os homens existissem; e os homens existem para que tenham alegria.", ref: "2 Néfi 2:25", source: "Livro de Mórmon" }
 ];
 
 export const FATHER_COUNSELS = [

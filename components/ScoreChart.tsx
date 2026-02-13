@@ -10,19 +10,25 @@ import {
   Area
 } from 'recharts';
 import { DailyLog } from '../types';
+import { HABITS } from '../constants';
 
 interface ScoreChartProps {
   logs: DailyLog[];
   currentScore: number;
   currentDate: string;
+  activeLog: DailyLog;
 }
 
-export const ScoreChart: React.FC<ScoreChartProps> = ({ logs, currentScore, currentDate }) => {
+export const ScoreChart: React.FC<ScoreChartProps> = ({ logs, currentDate, activeLog }) => {
   const dateObj = new Date(currentDate + 'T12:00:00');
   const month = dateObj.getMonth();
   const year = dateObj.getFullYear();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const monthName = dateObj.toLocaleDateString('pt-br', { month: 'long' });
+
+  // Cálculo de progresso para exibição abaixo do título
+  const completedCountToday = Object.values(activeLog.habits).filter(Boolean).length;
+  const progressPercentToday = Math.round((completedCountToday / HABITS.length) * 100);
 
   // Gera dados para todos os dias do mês atual
   const chartData = Array.from({ length: daysInMonth }, (_, i) => {
@@ -40,12 +46,15 @@ export const ScoreChart: React.FC<ScoreChartProps> = ({ logs, currentScore, curr
     <div className="bg-[#121212] rounded-[2.5rem] p-8 border border-[#262626] w-full shadow-2xl relative">
       <div className="flex justify-between items-start mb-10">
         <div>
-          <h3 className="text-[10px] font-black text-[#ff3d00] uppercase mb-1">Status Diário</h3>
-          <p className="text-4xl font-black text-white">Minha Performance <span className="text-[#ff3d00]">{currentScore.toFixed(1)}</span></p>
+          <h3 className="text-[10px] font-black text-[#ff3d00] uppercase mb-1 tracking-[0.2em]">Status Diário</h3>
+          <p className="text-4xl font-black text-white uppercase tracking-tighter">Minha Performance</p>
+          <p className="text-sm font-black text-slate-500 uppercase mt-1 tracking-widest">
+            Hoje: <span className="text-[#ff3d00]">{progressPercentToday}%</span> concluído
+          </p>
         </div>
         
         <div className="text-right">
-          <div className="text-[10px] font-black text-slate-500 uppercase mb-1">Ciclo Mensal</div>
+          <div className="text-[10px] font-black text-slate-500 uppercase mb-1 tracking-[0.2em]">Ciclo Mensal</div>
           <div className="text-2xl font-black text-white uppercase italic">
             {monthName} <span className="text-[#ff3d00]">— {daysInMonth} dias</span>
           </div>

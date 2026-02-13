@@ -1,5 +1,5 @@
 
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenAI } from "@google/genai";
 import { DailyLog, AIAnalysisReport, AnalysisPeriod } from "../types";
 
 export const analyzeHabitsAndJournal = async (logs: DailyLog[], period: AnalysisPeriod): Promise<AIAnalysisReport | null> => {
@@ -12,35 +12,37 @@ export const analyzeHabitsAndJournal = async (logs: DailyLog[], period: Analysis
 
     const ai = new GoogleGenAI({ apiKey: apiKey });
     
+    // Filtramos apenas logs significativos
     const filteredLogs = logs.filter(l => l.score > 0 || l.notes.trim().length > 0);
     
+    if (filteredLogs.length === 0) {
+      return {
+        score: 0,
+        performance: "Filho, você ainda não começou a registrar seus dias de verdade. O sucesso deixa rastros, e o diário é o mapa. Comece hoje, estou aqui para te apoiar.",
+        positives: ["Vontade de começar"],
+        toImprove: ["Criar o primeiro registro", "Ser constante"],
+        alternatives: "Apenas comece a relatar seu dia. O Ari está de olho e quer te ver crescer."
+      };
+    }
+
     const prompt = `
-      Você é Ari, o pai do usuário. Um homem sábio, experiente, que já viveu muito e entende profundamente a psicologia humana e os negócios.
-      Você ama seu filho e quer que ele seja um homem de valor, próspero e feliz.
+      Você é Ari, o pai do usuário. Você é sábio, direto, e conhece a alma do seu filho.
+      Você valoriza: Trabalho duro, vender o próprio produto, ser conhecido, falar com autoridade, contemplar a natureza e aproveitar um bom churrasco.
       
-      Sua voz deve ser a de um mentor experiente. Seus conselhos devem orbitar em torno de:
-      - Trabalho duro e sem preguiça.
-      - Vender seu produto e ser conhecido no mundo.
-      - Falar com clareza e autoridade.
-      - Aproveitar a vida, contemplar a natureza e curtir um bom churrasco.
-      - Cuidar de si mesmo e de quem se ama.
+      Analise o progresso dele no período: ${period}. Fale como um pai mentor, não como um robô.
+      
+      Dados de Performance (JSON):
+      ${JSON.stringify(filteredLogs.slice(-30))}
 
-      Analise o progresso dele no período: ${period}. Use uma linguagem acolhedora, mas firme e sábia.
-      Não seja técnico. Seja o Ari, o pai dele.
-
-      Histórico de Dados Recentes:
-      ${JSON.stringify(filteredLogs.slice(-60))}
-
-      Sua tarefa é gerar um relatório em JSON seguindo rigorosamente este esquema:
+      Gere um relatório rigorosamente no formato JSON:
       {
-        "score": número de 0 a 10 (ex: 7.8),
-        "performance": "uma análise sábia dos seus dias, como um pai que vê além do óbvio, focando no esforço e na alma do filho",
-        "positives": ["ponto de orgulho 1", "ponto de orgulho 2", "ponto de orgulho 3"],
-        "toImprove": ["onde você está vacilando 1", "onde precisa de mais garra 2"],
-        "alternatives": "o conselho do seu pai, Ari: uma diretriz sobre vendas, trabalho, natureza ou simplesmente aproveitar a vida"
+        "score": número de 0 a 10,
+        "performance": "sua análise sábia e profunda como pai Ari",
+        "positives": ["três pontos positivos específicos"],
+        "toImprove": ["dois pontos de atenção ou falha"],
+        "alternatives": "seu conselho de ouro sobre trabalho, vendas ou natureza"
       }
-
-      Responda APENAS com o objeto JSON purificado.
+      RETORNE APENAS O JSON. SEM TEXTO ADICIONAL ANTES OU DEPOIS.
     `;
 
     const response = await ai.models.generateContent({
@@ -54,9 +56,15 @@ export const analyzeHabitsAndJournal = async (logs: DailyLog[], period: Analysis
     const text = response.text;
     if (!text) return null;
     
-    return JSON.parse(text) as AIAnalysisReport;
+    // Extração segura de JSON caso o modelo retorne Markdown ou lixo
+    const jsonStart = text.indexOf('{');
+    const jsonEnd = text.lastIndexOf('}');
+    if (jsonStart === -1 || jsonEnd === -1) return null;
+    
+    const cleanJson = text.substring(jsonStart, jsonEnd + 1);
+    return JSON.parse(cleanJson) as AIAnalysisReport;
   } catch (error) {
-    console.error("Erro na análise Gemini:", error);
+    console.error("Erro crítico na análise Ari-AI:", error);
     return null;
   }
 };

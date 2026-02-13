@@ -81,7 +81,7 @@ const App: React.FC = () => {
       const result = await analyzeHabitsAndJournal(logs, period);
       if (result) setAnalysis(result);
     } catch (e) {
-      console.error(e);
+      console.error("Erro na análise:", e);
     } finally {
       setIsAnalyzing(false);
     }
@@ -91,20 +91,19 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen text-white selection:bg-[#ff3d00] selection:text-black pb-10">
-      <nav className="border-b border-white/5 py-6 px-10 sticky top-0 z-50 bg-[#0d0d0d]/80 backdrop-blur-md">
+      <nav className="border-b border-white/5 py-6 px-10 sticky top-0 z-50 bg-[#0d0d0d]/90 backdrop-blur-md">
         <div className="max-w-[1600px] mx-auto flex justify-between items-center">
           <div className="flex-1">
-            <span className="text-2xl font-black uppercase italic text-white hover:text-[#ff3d00] transition-colors cursor-default">
+            <span className="text-2xl font-black uppercase text-[#ff3d00] hover:scale-105 transition-transform cursor-default tracking-tighter">
               CPF em Paz
             </span>
           </div>
-          <div className="flex-1 flex justify-center items-center gap-4">
-             <span className="text-[10px] font-black text-[#ff3d00] uppercase tracking-widest hidden sm:block">Foco & Fé</span>
+          <div className="flex-1 flex justify-center items-center gap-6">
              <input 
               type="date" 
               value={currentDate} 
               onChange={(e) => setCurrentDate(e.target.value)}
-              className="bg-[#121212] border border-[#ff3d00]/30 rounded-xl px-5 py-2 text-sm font-black text-[#ff3d00] outline-none hover:border-[#ff3d00] transition-all"
+              className="bg-[#121212] border border-[#ff3d00]/30 rounded-xl px-5 py-2 text-sm font-black text-[#ff3d00] outline-none hover:border-[#ff3d00] transition-all focus:ring-2 focus:ring-[#ff3d00]/20"
             />
           </div>
           <div className="flex-1 text-right">
@@ -112,7 +111,7 @@ const App: React.FC = () => {
               href="https://instagram.com/oreismatheus" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="text-[11px] font-black text-slate-500 hover:text-[#ff3d00] transition-colors uppercase"
+              className="text-[11px] font-black text-slate-500 hover:text-[#ff3d00] transition-colors uppercase tracking-widest"
             >
               @oreismatheus
             </a>
@@ -120,10 +119,10 @@ const App: React.FC = () => {
         </div>
       </nav>
 
-      <main className="max-w-[1600px] mx-auto px-6 py-8 space-y-12">
-        <div className="w-full flex justify-center">
+      <main className="max-w-[1600px] mx-auto px-6 py-8 space-y-8">
+        <div className="w-full flex justify-center animate-in fade-in slide-in-from-top-4 duration-500">
           <div className="w-full">
-            <ScoreChart logs={logs} currentScore={activeLog.score} currentDate={currentDate} />
+            <ScoreChart logs={logs} currentScore={activeLog.score} currentDate={currentDate} activeLog={activeLog} />
           </div>
         </div>
 
@@ -132,7 +131,7 @@ const App: React.FC = () => {
             <ExternalPanel />
           </div>
 
-          <div className="lg:col-span-6 space-y-8">
+          <div className="lg:col-span-6 space-y-8 transition-all">
             <JournalEditor 
               currentDate={currentDate}
               onDateChange={setCurrentDate}
@@ -158,27 +157,27 @@ const App: React.FC = () => {
               isSaving={isSaving}
             />
 
-            <div className="bg-[#121212] rounded-[2.5rem] p-8 border border-[#262626] shadow-2xl relative overflow-hidden flex flex-col">
+            <div className="bg-[#121212] rounded-[2.5rem] p-8 border border-[#262626] shadow-2xl relative overflow-hidden flex flex-col transition-all">
               <div className="max-w-full text-left">
-                <h3 className="text-3xl font-black mb-1 text-[#ff3d00]">Relatório de Evolução</h3>
-                <p className="text-slate-500 text-xs mb-6">Uma análise sábia dos seus dias com o conselho do seu pai.</p>
+                <h3 className="text-3xl font-black mb-1 text-[#ff3d00] uppercase tracking-tighter">Relatório de Evolução</h3>
+                <p className="text-slate-500 text-xs mb-6 font-bold uppercase tracking-widest">A visão do seu pai, Ari, sobre seus passos.</p>
                 
                 {!analysis && !isAnalyzing && !showAnalysisOptions && (
                   <button 
                     onClick={() => setShowAnalysisOptions(true)}
-                    className="bg-[#ff3d00] text-black px-8 py-4 rounded-2xl font-black text-sm hover:scale-105 transition-all shadow-lg shadow-[#ff3d00]/20"
+                    className="bg-[#ff3d00] text-black px-12 py-6 rounded-3xl font-black text-base hover:scale-105 transition-all shadow-xl shadow-[#ff3d00]/20 uppercase tracking-tighter active:scale-95"
                   >
-                    Ouvir Ari
+                    Ouvir Sabedoria do Ari
                   </button>
                 )}
 
                 {showAnalysisOptions && (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 animate-in fade-in zoom-in-95 duration-300">
                     {periods.map(p => (
                       <button 
                         key={p}
                         onClick={() => handleGenerateReport(p)}
-                        className="bg-[#1a1a1a] border border-[#262626] hover:border-[#ff3d00] py-3 rounded-xl text-[9px] font-black uppercase text-slate-500 hover:text-white transition-all"
+                        className="bg-[#1a1a1a] border border-[#262626] hover:border-[#ff3d00] py-5 rounded-2xl text-[11px] font-black uppercase text-slate-500 hover:text-white transition-all shadow-md active:bg-[#ff3d00] active:text-black"
                       >
                         {p}
                       </button>
@@ -187,49 +186,54 @@ const App: React.FC = () => {
                 )}
 
                 {isAnalyzing && (
-                  <div className="flex items-center space-x-4 text-[#ff3d00] font-black text-[10px] py-4">
-                    <div className="w-4 h-4 border-2 border-[#ff3d00] border-t-transparent rounded-full animate-spin"></div>
-                    <span>SEU PAI, ARI, ESTÁ OBSERVANDO SEUS PASSOS...</span>
+                  <div className="flex items-center space-x-6 text-[#ff3d00] font-black text-[13px] py-12 animate-pulse">
+                    <div className="w-10 h-10 border-4 border-[#ff3d00] border-t-transparent rounded-full animate-spin"></div>
+                    <span className="uppercase tracking-[0.3em] font-black">Ari está contemplando o seu caminho...</span>
                   </div>
                 )}
 
                 {analysis && !isAnalyzing && (
-                  <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500 max-h-[800px] overflow-y-auto pr-2 custom-scrollbar">
-                    <div className="flex items-end justify-between border-b border-[#262626] pb-4 sticky top-0 bg-[#121212] z-10 pt-2">
+                  <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-500 max-h-[800px] overflow-y-auto pr-4 custom-scrollbar">
+                    <div className="flex items-end justify-between border-b border-[#262626] pb-8 sticky top-0 bg-[#121212] z-10 pt-4">
                       <div>
-                        <div className="text-[9px] font-black text-[#ff3d00] uppercase mb-1">Nota de Performance</div>
-                        <div className="text-6xl font-black text-white leading-none">{analysis.score}</div>
+                        <div className="text-[11px] font-black text-[#ff3d00] uppercase mb-2 tracking-[0.2em]">Nota do Ari</div>
+                        <div className="text-8xl font-black text-white leading-none tracking-tighter">{analysis.score.toFixed(1)}</div>
                       </div>
-                      <button onClick={() => setAnalysis(null)} className="text-slate-600 hover:text-white transition-colors text-[9px] font-black uppercase">Nova Consulta</button>
+                      <button onClick={() => setAnalysis(null)} className="text-slate-500 hover:text-white transition-colors text-[10px] font-black uppercase tracking-widest border border-[#262626] px-5 py-3 rounded-2xl hover:bg-white/5">Nova Análise</button>
                     </div>
                     
-                    <div>
-                      <h4 className="text-[9px] font-black text-[#ff3d00] uppercase mb-2">Análise Sábia</h4>
-                      <p className="text-lg font-bold leading-tight text-slate-100 italic">"{analysis.performance}"</p>
+                    <div className="bg-[#1a1a1a] p-10 rounded-[2.5rem] border-l-[12px] border-[#ff3d00] shadow-inner">
+                      <h4 className="text-[11px] font-black text-[#ff3d00] uppercase mb-5 tracking-[0.3em]">Papo Sincero</h4>
+                      <p className="text-2xl font-black leading-[1.2] text-slate-100 uppercase tracking-tight">{analysis.performance}</p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="bg-[#1a1a1a] p-5 rounded-[1.2rem] border border-[#262626]">
-                        <div className="text-[9px] font-black text-emerald-500 uppercase mb-2">Pontos de Orgulho</div>
-                        <ul className="space-y-1">
-                          {analysis.positives.map((s, i) => <li key={i} className="flex items-start text-[11px] font-bold text-slate-400">
-                            <span className="text-emerald-500 mr-2">✓</span> {s}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="bg-[#1a1a1a] p-8 rounded-[2.5rem] border border-[#262626] group hover:border-[#10b981]/30 transition-colors">
+                        <div className="text-[11px] font-black text-emerald-500 uppercase mb-5 tracking-[0.2em]">Orgulho do Pai</div>
+                        <ul className="space-y-4">
+                          {analysis.positives.map((s, i) => <li key={i} className="flex items-start text-sm font-black text-slate-300">
+                            <span className="text-emerald-500 mr-4 text-xl leading-none">★</span> {s}
                           </li>)}
                         </ul>
                       </div>
-                      <div className="bg-[#1a1a1a] p-5 rounded-[1.2rem] border border-[#262626]">
-                        <div className="text-[9px] font-black text-amber-500 uppercase mb-2">Onde ter mais garra</div>
-                        <ul className="space-y-1">
-                          {analysis.toImprove.map((s, i) => <li key={i} className="flex items-start text-[11px] font-bold text-slate-400">
-                            <span className="text-amber-500 mr-2">→</span> {s}
+                      <div className="bg-[#1a1a1a] p-8 rounded-[2.5rem] border border-[#262626] group hover:border-[#f59e0b]/30 transition-colors">
+                        <div className="text-[11px] font-black text-amber-500 uppercase mb-5 tracking-[0.2em]">Ajuste o Rumo</div>
+                        <ul className="space-y-4">
+                          {analysis.toImprove.map((s, i) => <li key={i} className="flex items-start text-sm font-black text-slate-300">
+                            <span className="text-amber-500 mr-4 text-xl leading-none">!</span> {s}
                           </li>)}
                         </ul>
                       </div>
                     </div>
 
-                    <div className="bg-[#ff3d00] p-6 rounded-[1.8rem] text-black shadow-lg mb-4">
-                      <div className="text-[9px] font-black uppercase mb-2 opacity-70">Conselho do seu pai, Ari</div>
-                      <p className="text-xl font-black leading-tight">{analysis.alternatives}</p>
+                    <div className="bg-[#ff3d00] p-12 rounded-[3rem] text-black shadow-2xl mb-8 relative group overflow-hidden">
+                      <div className="absolute top-0 right-0 p-8 opacity-10 scale-150 rotate-12 group-hover:scale-[2] transition-transform duration-1000">
+                        <span className="text-9xl">💡</span>
+                      </div>
+                      <div className="relative z-10">
+                        <div className="text-[11px] font-black uppercase mb-4 opacity-80 tracking-[0.3em]">Conselho de Ouro do Ari</div>
+                        <p className="text-3xl font-black leading-none tracking-tighter uppercase">{analysis.alternatives}</p>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -248,17 +252,19 @@ const App: React.FC = () => {
         </div>
       </main>
 
-      <footer className="py-10 text-center select-none pointer-events-none opacity-0 h-0 overflow-hidden">
+      <footer className="py-20 text-center select-none pointer-events-none opacity-0 h-0 overflow-hidden">
         <span className="text-[#0d0d0d] text-[10px] font-black uppercase tracking-[0.5em]">
           My CPF in Peace • 2025
         </span>
       </footer>
 
       <style>{`
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #262626; border-radius: 10px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #ff3d00; }
+        * { font-variant-numeric: tabular-nums; }
+        body { overflow-y: scroll; }
       `}</style>
     </div>
   );
