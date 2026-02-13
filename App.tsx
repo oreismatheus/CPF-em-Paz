@@ -158,8 +158,7 @@ const App: React.FC = () => {
               isSaving={isSaving}
             />
 
-            {/* Container do Relatório com correção de bug de tamanho e persona de Pai Sábio */}
-            <div className="bg-[#121212] rounded-[2.5rem] p-8 border border-[#262626] shadow-2xl relative overflow-hidden min-h-[200px]">
+            <div className="bg-[#121212] rounded-[2.5rem] p-8 border border-[#262626] shadow-2xl relative overflow-hidden flex flex-col">
               <div className="max-w-full text-left">
                 <h3 className="text-3xl font-black mb-1 text-[#ff3d00]">Relatório de Evolução</h3>
                 <p className="text-slate-500 text-xs mb-6">Uma análise sábia dos seus dias com o conselho do seu pai.</p>
@@ -169,7 +168,7 @@ const App: React.FC = () => {
                     onClick={() => setShowAnalysisOptions(true)}
                     className="bg-[#ff3d00] text-black px-8 py-4 rounded-2xl font-black text-sm hover:scale-105 transition-all shadow-lg shadow-[#ff3d00]/20"
                   >
-                    Ouvir Sabedoria
+                    Ouvir Ari
                   </button>
                 )}
 
@@ -188,15 +187,15 @@ const App: React.FC = () => {
                 )}
 
                 {isAnalyzing && (
-                  <div className="flex items-center space-x-4 text-[#ff3d00] font-black text-[10px]">
+                  <div className="flex items-center space-x-4 text-[#ff3d00] font-black text-[10px] py-4">
                     <div className="w-4 h-4 border-2 border-[#ff3d00] border-t-transparent rounded-full animate-spin"></div>
-                    <span>SEU PAI ESTÁ OBSERVANDO SEUS PASSOS COM SABEDORIA...</span>
+                    <span>SEU PAI, ARI, ESTÁ OBSERVANDO SEUS PASSOS...</span>
                   </div>
                 )}
 
                 {analysis && !isAnalyzing && (
-                  <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
-                    <div className="flex items-end justify-between border-b border-[#262626] pb-4">
+                  <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500 max-h-[800px] overflow-y-auto pr-2 custom-scrollbar">
+                    <div className="flex items-end justify-between border-b border-[#262626] pb-4 sticky top-0 bg-[#121212] z-10 pt-2">
                       <div>
                         <div className="text-[9px] font-black text-[#ff3d00] uppercase mb-1">Nota de Performance</div>
                         <div className="text-6xl font-black text-white leading-none">{analysis.score}</div>
@@ -211,7 +210,7 @@ const App: React.FC = () => {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="bg-[#1a1a1a] p-5 rounded-[1.2rem] border border-[#262626]">
-                        <div className="text-[9px] font-black text-emerald-500 uppercase mb-2">Pontos Positivos</div>
+                        <div className="text-[9px] font-black text-emerald-500 uppercase mb-2">Pontos de Orgulho</div>
                         <ul className="space-y-1">
                           {analysis.positives.map((s, i) => <li key={i} className="flex items-start text-[11px] font-bold text-slate-400">
                             <span className="text-emerald-500 mr-2">✓</span> {s}
@@ -219,7 +218,7 @@ const App: React.FC = () => {
                         </ul>
                       </div>
                       <div className="bg-[#1a1a1a] p-5 rounded-[1.2rem] border border-[#262626]">
-                        <div className="text-[9px] font-black text-amber-500 uppercase mb-2">Pontos Negativos</div>
+                        <div className="text-[9px] font-black text-amber-500 uppercase mb-2">Onde ter mais garra</div>
                         <ul className="space-y-1">
                           {analysis.toImprove.map((s, i) => <li key={i} className="flex items-start text-[11px] font-bold text-slate-400">
                             <span className="text-amber-500 mr-2">→</span> {s}
@@ -228,8 +227,8 @@ const App: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="bg-[#ff3d00] p-6 rounded-[1.8rem] text-black shadow-lg">
-                      <div className="text-[9px] font-black uppercase mb-2 opacity-70">Conselho do seu Pai</div>
+                    <div className="bg-[#ff3d00] p-6 rounded-[1.8rem] text-black shadow-lg mb-4">
+                      <div className="text-[9px] font-black uppercase mb-2 opacity-70">Conselho do seu pai, Ari</div>
                       <p className="text-xl font-black leading-tight">{analysis.alternatives}</p>
                     </div>
                   </div>
@@ -249,12 +248,18 @@ const App: React.FC = () => {
         </div>
       </main>
 
-      {/* Rodapé invisível / Mesma cor do fundo conforme pedido */}
-      <footer className="py-10 text-center select-none opacity-0">
+      <footer className="py-10 text-center select-none pointer-events-none opacity-0 h-0 overflow-hidden">
         <span className="text-[#0d0d0d] text-[10px] font-black uppercase tracking-[0.5em]">
           My CPF in Peace • 2025
         </span>
       </footer>
+
+      <style>{`
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #262626; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #ff3d00; }
+      `}</style>
     </div>
   );
 };

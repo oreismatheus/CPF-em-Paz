@@ -33,15 +33,13 @@ export const DAILY_CHALLENGES = [
 ];
 
 export const LDS_QUOTES = [
-  { text: "O Senhor ama o esforço, porque o esforço traz recompensas que não podem vir de outra forma.", author: "Russell M. Nelson (Conferência Geral)" },
-  { text: "A alegria que sentimos tem pouco a ver com as circunstâncias de nossa vida e tudo a ver com o foco de nossa vida.", author: "Russell M. Nelson (Conferência Geral)" },
-  { text: "Não se compare com os outros. Compare-se com a pessoa que você era ontem.", author: "Dieter F. Uchtdorf (Discurso na BYU)" },
-  { text: "Nossa meta deve ser a excelência, não a perfeição.", author: "Dallin H. Oaks (Discurso na BYU)" },
-  { text: "A fé não é apenas um sentimento; é uma decisão.", author: "Neil L. Andersen (Conferência Geral)" },
-  { text: "O amanhã será melhor se fizermos o melhor hoje.", author: "Thomas S. Monson (Conferência Geral)" },
-  { text: "A verdadeira medida de sua vida não é quanto você acumulou, mas quanto você deu.", author: "M. Russell Ballard (Conferência Geral)" },
-  { text: "A disciplina é o fundamento sobre o qual todos os sucessos são construídos.", author: "D. Todd Christofferson (Discurso na BYU)" },
-  { text: "Sejam humildes; e o Senhor vosso Deus vos conduzirá pela mão e dará resposta a vossas orações.", author: "D&C 112:10" }
+  { text: "O Senhor ama o esforço, porque o esforço traz recompensas que não podem vir de outra forma.", author: "Russell M. Nelson" },
+  { text: "A alegria que sentimos tem pouco a ver com as circunstâncias de nossa vida e tudo a ver com o foco de nossa vida.", author: "Russell M. Nelson" },
+  { text: "Não se compare com os outros. Compare-se com a pessoa que você era ontem.", author: "Dieter F. Uchtdorf" },
+  { text: "Nossa meta deve ser a excelência, não a perfeição.", author: "Dallin H. Oaks" },
+  { text: "A fé não é apenas um sentimento; é uma decisão.", author: "Neil L. Andersen" },
+  { text: "O amanhã será melhor se fizermos o melhor hoje.", author: "Thomas S. Monson" },
+  { text: "A verdadeira medida de sua vida não é quanto você acumulou, mas quanto você deu.", author: "M. Russell Ballard" }
 ];
 
 export const SCRIPTURES = [
@@ -51,4 +49,26 @@ export const SCRIPTURES = [
   { text: "Eu, o Senhor, estou obrigado quando fazeis o que eu digo; mas quando não fazeis o que eu digo, não tendes promessa alguma.", ref: "Doutrina e Convênios 82:10" },
   { text: "E se os homens vierem a mim, mostrar-lhes-ei sua fraqueza... minha graça basta a todos os que se humilham perante mim.", ref: "Éter 12:27 (Livro de Mórmon)" },
   { text: "Adam caiu para que os homens existissem; e os homens existem para que tenham alegria.", ref: "2 Néfi 2:25 (Livro de Mórmon)" }
+];
+
+export const FATHER_COUNSELS = [
+  "Aproveite a vida, meu filho. O tempo não volta.",
+  "Contemple a natureza hoje, nem que seja por 5 minutos.",
+  "Venda seu produto, não tenha vergonha do seu valor.",
+  "Seja conhecido. Quem não é visto, não é lembrado.",
+  "Fale com autoridade e clareza.",
+  "Aproveite cada momento com quem você ama.",
+  "Cuide da sua saúde, você só tem um corpo.",
+  "Trabalhe duro, mas saiba quando parar.",
+  "Não tenha preguiça. O mundo pertence aos que se levantam.",
+  "Aproveite um bom churrasco com os amigos.",
+  "A natureza cura o que o asfalto adoece."
+];
+
+export const DAILY_MOTIVATIONS = [
+  "Você é capaz de coisas incríveis hoje.",
+  "Mantenha o foco no que realmente importa.",
+  "Sua disciplina é sua maior liberdade.",
+  "Um passo de cada vez, mas sempre para frente.",
+  "Hoje é o melhor dia para ser melhor."
 ];

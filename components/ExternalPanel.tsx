@@ -1,6 +1,6 @@
 
 import React, { useMemo } from 'react';
-import { SCRIPTURES, DAILY_CHALLENGES, LDS_QUOTES } from '../constants';
+import { SCRIPTURES, DAILY_CHALLENGES, LDS_QUOTES, FATHER_COUNSELS, DAILY_MOTIVATIONS } from '../constants';
 
 export const ExternalPanel: React.FC = () => {
   const dailyIndex = useMemo(() => {
@@ -13,6 +13,8 @@ export const ExternalPanel: React.FC = () => {
 
   const quote = LDS_QUOTES[dailyIndex % LDS_QUOTES.length];
   const scripture = SCRIPTURES[dailyIndex % SCRIPTURES.length];
+  const fatherCounsel = FATHER_COUNSELS[dailyIndex % FATHER_COUNSELS.length];
+  const motivation = DAILY_MOTIVATIONS[dailyIndex % DAILY_MOTIVATIONS.length];
   const challenge = DAILY_CHALLENGES[dailyIndex % DAILY_CHALLENGES.length];
 
   const Card = ({ title, content, subContent }: { title: string, content: string, subContent?: string }) => (
@@ -36,7 +38,7 @@ export const ExternalPanel: React.FC = () => {
   return (
     <div className="space-y-6">
       <Card 
-        title="Citação de Líder SUD" 
+        title="Citação do líder da igreja" 
         content={quote.text}
         subContent={quote.author}
       />
@@ -48,13 +50,19 @@ export const ExternalPanel: React.FC = () => {
       />
 
       <Card 
-        title="Frase do Dia" 
-        content="O amanhã será melhor se fizermos o melhor hoje. Siga em frente com fé e propósito."
-        subContent="Motivação"
+        title="Conselho do meu pai" 
+        content={fatherCounsel}
+        subContent="Seu pai, Ari"
+      />
+
+      <Card 
+        title="Frase do dia" 
+        content={motivation}
+        subContent="Foco & Fé"
       />
       
       <Card 
-        title="Desafio 24h" 
+        title="Desafio 24 horas" 
         content={challenge}
       />
     </div>
